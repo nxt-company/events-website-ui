@@ -14,6 +14,8 @@ function EventDashboard() {
   const [error, setError] = useState(null);
   const [eventDetails, setEventDetails] = useState(null);
   const [eventDetailsError, setEventDetailsError] = useState(null);
+  const [selectedUserAnswers, setSelectedUserAnswers] = useState(null); // For modal
+  const [showAnswersModal, setShowAnswersModal] = useState(false);
 
   // Fetch event details and results
   useEffect(() => {
@@ -60,7 +62,7 @@ function EventDashboard() {
       const newOptions = options.filter((_, i) => i !== index);
       setOptions(newOptions);
       if (correctAnswer >= newOptions.length) {
-        setCorrectAnswer(newQuestions.length - 1);
+        setCorrectAnswer(newOptions.length - 1);
       }
     }
   };
@@ -162,6 +164,16 @@ function EventDashboard() {
     } catch (error) {
       setError(error.response?.data?.error || error.message);
     }
+  };
+
+  const handleViewAnswers = (userResult) => {
+    setSelectedUserAnswers(userResult);
+    setShowAnswersModal(true);
+  };
+
+  const closeAnswersModal = () => {
+    setShowAnswersModal(false);
+    setSelectedUserAnswers(null);
   };
 
   return (
@@ -336,31 +348,30 @@ function EventDashboard() {
           )}
           {activeView === 'results' && (
             <div className="mb-6">
-              <h3 className="text-2xl font-semibold text-white mb-4">User Submissions</h3>
+              <h3 className="text-2xl font-semibold text-white mb-4">Leaderboard</h3>
               {results && results.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-gray-800">
                         <th className="p-3 text-white">Username</th>
-                        <th className="p-3 text-white">Answers</th>
                         <th className="p-3 text-white">Score</th>
+                        <th className="p-3 text-white">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {results.map((result) => (
                         <tr key={result.username} className="border-t border-gray-700">
                           <td className="p-3 text-white">{result.username}</td>
-                          <td className="p-3 text-white">
-                            {result.answers.map((answer, index) => (
-                              <div key={index} className="mb-2">
-                                <p><strong>Q:</strong> {answer.question_text}</p>
-                                <p><strong>Selected:</strong> Option {answer.selected_option + 1} ({answer.options[answer.selected_option]})</p>
-                                <p><strong>Correct:</strong> Option {answer.correct_option + 1} ({answer.options[answer.correct_option]})</p>
-                              </div>
-                            ))}
-                          </td>
                           <td className="p-3 text-white">{result.correct_answers}/{result.total_questions}</td>
+                          <td className="p-3">
+                            <button
+                              className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                              onClick={() => handleViewAnswers(result)}
+                            >
+                              View Answers
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -374,6 +385,28 @@ function EventDashboard() {
                   <p><strong>Error:</strong> {error}</p>
                 </div>
               )}
+            </div>
+          )}
+          {showAnswersModal && selectedUserAnswers && (
+            <div className="modal">
+              <div className="modal-content">
+                <h2 className="text-2xl font-bold text-white mb-4">Answers for {selectedUserAnswers.username}</h2>
+                <div className="space-y-4">
+                  {selectedUserAnswers.answers.map((answer, index) => (
+                    <div key={index} className="p-4 bg-gray-900 rounded">
+                      <p><strong>Question:</strong> {answer.question_text}</p>
+                      <p><strong>Selected:</strong> Option {answer.selected_option + 1} ({answer.options[answer.selected_option]})</p>
+                      <p><strong>Correct:</strong> Option {answer.correct_option + 1} ({answer.options[answer.correct_option]})</p>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  className="w-full p-2 mt-4 bg-gray-600 text-white rounded hover:bg-gray-700"
+                  onClick={closeAnswersModal}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           )}
         </>
