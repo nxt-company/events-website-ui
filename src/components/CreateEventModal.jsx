@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function CreateEventModal({ onClose }) {
   const [name, setName] = useState('');
-  const [eventType, setEventType] = useState('QA'); // Default to QA
+  const [eventType, setEventType] = useState('QA');
   const [creatorUsername, setCreatorUsername] = useState('');
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
   const [eventTypes, setEventTypes] = useState([]);
+  const navigate = useNavigate();
 
-  // Fetch event types on component mount
   useEffect(() => {
     const fetchEventTypes = async () => {
       try {
@@ -32,6 +33,11 @@ function CreateEventModal({ onClose }) {
         creator_username: creatorUsername
       });
       setResponse(res.data);
+      // Store event name and creator code in localStorage
+      localStorage.setItem(`event_name_${res.data.event_id}`, name);
+      localStorage.setItem(`creator_code_${res.data.event_id}`, res.data.creator_code);
+      onClose(); // Close the modal
+      navigate(`/event/${res.data.event_id}`); // Redirect to event dashboard
     } catch (error) {
       setError(error.response?.data?.error || error.message);
     }
