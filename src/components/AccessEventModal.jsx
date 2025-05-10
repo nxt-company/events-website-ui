@@ -64,6 +64,7 @@ function AccessEventModal({ onClose }) {
           <div className="response mt-4 p-4 bg-gray-900 rounded">
             <p><strong>Event Name:</strong> {response.name}</p>
             <p><strong>Event ID:</strong> {response.id}</p>
+            <p><strong>Event Type:</strong> {response.type}</p>
           </div>
         )}
       </div>

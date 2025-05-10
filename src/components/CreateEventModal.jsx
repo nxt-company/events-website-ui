@@ -1,21 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function CreateEventModal({ onClose }) {
   const [name, setName] = useState('');
+  const [eventType, setEventType] = useState('QA'); // Default to QA
   const [creatorUsername, setCreatorUsername] = useState('');
   const [response, setResponse] = useState(null);
+  const [error, setError] = useState(null);
+  const [eventTypes, setEventTypes] = useState([]);
+
+  // Fetch event types on component mount
+  useEffect(() => {
+    const fetchEventTypes = async () => {
+      try {
+        const res = await axios.get('/api/v1/event-types');
+        setEventTypes(res.data);
+      } catch (error) {
+        setError(error.response?.data?.error || error.message);
+      }
+    };
+    fetchEventTypes();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     try {
       const res = await axios.post('/api/v1/events', {
         name,
+        type: eventType,
         creator_username: creatorUsername
       });
       setResponse(res.data);
     } catch (error) {
-      alert('Error creating event: ' + (error.response?.data?.error || error.message));
+      setError(error.response?.data?.error || error.message);
     }
   };
 
@@ -23,22 +41,51 @@ function CreateEventModal({ onClose }) {
     <div className="modal">
       <div className="modal-content">
         <h2>Create Event</h2>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Event Name"
-        />
-        <input
-          type="text"
-          value={creatorUsername}
-          onChange={(e) => setCreatorUsername(e.target.value)}
-          placeholder="Creator Username"
-        />
-        <button onClick={handleSubmit}>Create</button>
-        <button className="close" onClick={onClose}>Close</button>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter Event Name (e.g., My Q&A)"
+            className="w-full p-2 mb-4 border border-gray-600 rounded bg-gray-900 text-white"
+          />
+          <select
+            value={eventType}
+            onChange={(e) => setEventType(e.target.value)}
+            className="w-full p-2 mb-4 border border-gray-600 rounded bg-gray-900 text-white"
+          >
+            {eventTypes.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+          <input
+            type="text"
+            value={creatorUsername}
+            onChange={(e) => setCreatorUsername(e.target.value)}
+            placeholder="Enter Creator Username (e.g., admin)"
+            className="w-full p-2 mb-4 border border-gray-600 rounded bg-gray-900 text-white"
+          />
+          <button
+            type="submit"
+            className="w-full p-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            Create
+          </button>
+          <button
+            type="button"
+            className="w-full p-2 mt-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            onClick={onClose}
+          >
+            Close
+          </button>
+        </form>
+        {error && (
+          <div className="response mt-4 p-4 bg-red-900 rounded text-red-200">
+            <p><strong>Error:</strong> {error}</p>
+          </div>
+        )}
         {response && (
-          <div className="response">
+          <div className="response mt-4 p-4 bg-gray-900 rounded">
             <p><strong>Event ID:</strong> {response.event_id}</p>
             <p><strong>Creator Code:</strong> {response.creator_code}</p>
           </div>
