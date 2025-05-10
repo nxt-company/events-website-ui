@@ -11,7 +11,6 @@ function EventDashboard() {
   const [correctAnswer, setCorrectAnswer] = useState(0);
   const [inviteUsername, setInviteUsername] = useState('');
   const [questionResponse, setQuestionResponse] = useState(null);
-  const [inviteResponse, setInviteResponse] = useState(null);
   const [error, setError] = useState(null);
   const [eventDetails, setEventDetails] = useState(null);
   const [eventDetailsError, setEventDetailsError] = useState(null);
@@ -106,10 +105,9 @@ function EventDashboard() {
     }
 
     try {
-      const res = await axios.post(`/api/v1/events/${eventID}/invite`, {
+      await axios.post(`/api/v1/events/${eventID}/invite`, {
         username: inviteUsername
       });
-      setInviteResponse(res.data);
       // Update event details to reflect new invite
       const updatedDetails = await axios.post('/api/v1/creator-access', {
         event_name: localStorage.getItem(`event_name_${eventID}`),
@@ -246,13 +244,6 @@ function EventDashboard() {
               <p><strong>Error:</strong> {error}</p>
             </div>
           )}
-          {inviteResponse && (
-            <div className="response mt-4 p-4 bg-gray-900 rounded">
-              <p><strong>Username:</strong> {inviteResponse.username}</p>
-              <p><strong>Invite Code:</strong> {inviteResponse.invite_code}</p>
-              <p><strong>Invite URL:</strong> {inviteResponse.invite_url}</p>
-            </div>
-          )}
         </div>
       )}
       <div className="mb-6">
@@ -279,6 +270,7 @@ function EventDashboard() {
               <div key={invite.invite_code} className="p-4 bg-gray-900 rounded">
                 <p><strong>Username:</strong> {invite.username}</p>
                 <p><strong>Invite Code:</strong> {invite.invite_code}</p>
+                <p><strong>Invite URL:</strong> http://localhost:8080/join?code={invite.invite_code}</p>
               </div>
             ))}
           </div>
