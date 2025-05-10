@@ -6,6 +6,8 @@ function EventView() {
   const { eventID } = useParams();
   const [eventDetails, setEventDetails] = useState(null);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [answers, setAnswers] = useState({}); // Store selected options { question_id: selected_option }
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -30,6 +32,38 @@ function EventView() {
     fetchEventDetails();
   }, [eventID]);
 
+  const handleOptionChange = (questionId, selectedOption) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: selectedOption
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    try {
+      const username = localStorage.getItem(`join_username_${eventID}`);
+      if (!username) {
+        setError('Username not found. Please join the event again.');
+        return;
+      }
+      const answerArray = Object.entries(answers).map(([questionId, selectedOption]) => ({
+        question_id: questionId,
+        selected_option: selectedOption
+      }));
+      const res = await axios.post(`/api/v1/events/${eventID}/submit-answers`, {
+        username,
+        answers: answerArray
+      });
+      setSuccess(res.data.message);
+      setAnswers({}); // Clear answers after submission
+    } catch (error) {
+      setError(error.response?.data?.error || error.message);
+    }
+  };
+
   return (
     <div className="container py-8">
       {eventDetails ? (
@@ -38,16 +72,48 @@ function EventView() {
           <div className="mb-6">
             <h3 className="text-2xl font-semibold text-white mb-4">Questions</h3>
             {eventDetails.questions && eventDetails.questions.length > 0 ? (
-              <div className="space-y-4">
-                {eventDetails.questions.map((question) => (
-                  <div key={question.id} className="p-4 bg-gray-900 rounded">
-                    <p><strong>Question:</strong> {question.text}</p>
-                    <p><strong>Options:</strong> {question.options.join(', ')}</p>
-                  </div>
-                ))}
-              </div>
+              <form onSubmit={handleSubmit}>
+                <div className="space-y-6">
+                  {eventDetails.questions.map((question) => (
+                    <div key={question.id} className="p-4 bg-gray-900 rounded">
+                      <p className="text-lg font-medium text-white mb-2"><strong>Question:</strong> {question.text}</p>
+                      <div className="space-y-2">
+                        {question.options.map((option, index) => (
+                          <label key={index} className="flex items-center space-x-2 text-white">
+                            <input
+                              type="radio"
+                              name={`question_${question.id}`}
+                              value={index}
+                              checked={answers[question.id] === index}
+                              onChange={() => handleOptionChange(question.id, index)}
+                              className="form-radio text-green-600"
+                            />
+                            <span>{option}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="submit"
+                  className="w-full p-2 mt-6 bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                  Submit Answers
+                </button>
+              </form>
             ) : (
               <p className="text-gray-400">No questions added</p>
+            )}
+            {error && (
+              <div className="response mt-4 p-4 bg-red-900 rounded text-red-200">
+                <p><strong>Error:</strong> {error}</p>
+              </div>
+            )}
+            {success && (
+              <div className="response mt-4 p-4 bg-gray-900 rounded text-white">
+                <p><strong>Success:</strong> {success}</p>
+              </div>
             )}
           </div>
         </>
