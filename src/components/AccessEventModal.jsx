@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function AccessEventModal({ onClose }) {
@@ -6,16 +7,22 @@ function AccessEventModal({ onClose }) {
   const [creatorCode, setCreatorCode] = useState('');
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
+    setError(null);
     try {
       const res = await axios.post('/api/v1/creator-access', {
         event_name: eventName,
         creator_code: creatorCode
       });
       setResponse(res.data.event);
+      // Store event name and creator code in localStorage
+      localStorage.setItem(`event_name_${res.data.event.id}`, eventName);
+      localStorage.setItem(`creator_code_${res.data.event.id}`, creatorCode);
+      onClose(); // Close the modal
+      navigate(`/event/${res.data.event.id}`); // Redirect to event dashboard
     } catch (error) {
       const errorMessage = error.response?.data?.error || error.message;
       setError(errorMessage);
