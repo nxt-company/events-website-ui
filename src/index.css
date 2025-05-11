@@ -2,27 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background: #e0e5ec;
+  --text-primary: #2d3436;
+  --text-secondary: #636e72;
+  --accent: #0984e3;
+  --border: #dfe6e9;
+  --shadow-light: #ffffff;
+  --shadow-dark: #a3b1c6;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #0d1117;
-  color: #c9d1d9;
+  background-color: var(--background);
+  color: var(--text-primary);
+}
+
+.neumorphic {
+  border-radius: 15px;
+  background: var(--background);
+  box-shadow: 8px 8px 15px var(--shadow-dark),
+              -8px -8px 15px var(--shadow-light);
+}
+
+.neumorphic-inset {
+  border-radius: 15px;
+  background: var(--background);
+  box-shadow: inset 8px 8px 15px var(--shadow-dark),
+              inset -8px -8px 15px var(--shadow-light);
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 24px;
 }
 
 .header {
-  background-color: #161b22;
-  padding: 16px 0;
+  background: var(--background);
+  padding: 20px 0;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .header .container {
@@ -32,33 +55,69 @@ body {
 }
 
 .logo {
-  font-size: 24px;
-  font-weight: 600;
-  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: var(--background);
+  box-shadow: 5px 5px 10px var(--shadow-dark),
+              -5px -5px 10px var(--shadow-light);
 }
 
 .nav-buttons {
   display: flex;
-  gap: 8px;
+  gap: 16px;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+  background: var(--background);
+  box-shadow: 5px 5px 10px var(--shadow-dark),
+              -5px -5px 10px var(--shadow-light);
+}
+
+.btn:hover {
+  box-shadow: 2px 2px 5px var(--shadow-dark),
+              -2px -2px 5px var(--shadow-light);
+  transform: translateY(2px);
+}
+
+.btn:active {
+  box-shadow: inset 5px 5px 10px var(--shadow-dark),
+              inset -5px -5px 10px var(--shadow-light);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
 }
 
 .hero {
-  padding: 64px 0;
+  padding: 80px 0;
   text-align: center;
 }
 
 .hero h1 {
   font-size: 48px;
   font-weight: 800;
-  margin-bottom: 16px;
-  color: #ffffff;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+  text-shadow: 2px 2px 4px var(--shadow-dark);
 }
 
 .hero p {
   font-size: 20px;
-  color: #8b949e;
+  color: var(--text-secondary);
   max-width: 600px;
-  margin: 0 auto 32px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
 }
 
 .modal {
@@ -72,74 +131,114 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 2000;
+  backdrop-filter: blur(5px);
 }
 
 .modal-content {
-  background: #21262d;
-  padding: 24px;
-  border-radius: 6px;
+  background: var(--background);
+  padding: 32px;
+  border-radius: 20px;
   width: 100%;
   max-width: 500px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 20px 20px 60px var(--shadow-dark),
+              -20px -20px 60px var(--shadow-light);
 }
 
 .modal-content h2 {
-  font-size: 24px;
-  margin-bottom: 16px;
-  color: #ffffff;
+  font-size: 28px;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+  text-align: center;
 }
 
-.modal-content input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 16px;
-  border: 1px solid #30363d;
-  border-radius: 4px;
-  background: #161b22;
-  color: #c9d1d9;
+.input-group {
+  margin-bottom: 20px;
 }
 
-.modal-content button {
+.input-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.input-field {
   width: 100%;
-  padding: 8px;
-  background: #238636;
-  color: #ffffff;
+  padding: 12px;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  border-radius: 12px;
+  background: var(--background);
+  color: var(--text-primary);
+  box-shadow: inset 5px 5px 10px var(--shadow-dark),
+              inset -5px -5px 10px var(--shadow-light);
+}
+
+.input-field:focus {
+  outline: none;
+  box-shadow: inset 3px 3px 6px var(--shadow-dark),
+              inset -3px -3px 6px var(--shadow-light);
+}
+
+.card {
+  padding: 24px;
+  margin-bottom: 20px;
+  border-radius: 15px;
+  background: var(--background);
+  box-shadow: 8px 8px 15px var(--shadow-dark),
+              -8px -8px 15px var(--shadow-light);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 20px;
   font-weight: 600;
-}
-
-.modal-content button:hover {
-  background: #2ea043;
-}
-
-.modal-content .close {
-  background: #6e7681;
-  margin-top: 8px;
-}
-
-.modal-content .close:hover {
-  background: #8b949e;
+  color: var(--text-primary);
 }
 
 .response {
-  margin-top: 16px;
+  margin-top: 20px;
   padding: 16px;
-  background: #161b22;
-  border-radius: 4px;
-  color: #c9d1d9;
+  border-radius: 12px;
+}
+
+.response.success {
+  background: #d4edda;
+  color: #155724;
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.response.error {
+  background: #f8d7da;
+  color: #721c24;
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
   .hero h1 {
-    font-size: 32px;
+    font-size: 36px;
   }
+  
   .hero p {
-    font-size: 16px;
+    font-size: 18px;
   }
+  
   .nav-buttons {
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
+  }
+  
+  .modal-content {
+    margin: 16px;
+    padding: 24px;
   }
 }
